@@ -1,5 +1,4 @@
 <?php
-
 /*
 	Plugin Name: Time Lord
 	Plugin URI: http://wordpress.org/plugins/time-lord/
@@ -125,5 +124,3 @@
 
 			return $ordinal;
 		}
-
-?>
