@@ -2,7 +2,7 @@ name: "👌 IMPROVE: Assets or readme"
 on:
   push:
     branches:
-      - trunk
+      - master
 jobs:
   master:
     name: "Push to trunk"
