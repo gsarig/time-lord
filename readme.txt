@@ -3,8 +3,8 @@ Contributors: gsarig
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R68GJ2RBSVXGN
 Tags: Shortcode, Time, schedule
 Requires at least: 5.3
-Tested up to: 6.4
-Stable tag: 1.2
+Tested up to: 7.1
+Stable tag: 1.2.1
 License: GPLv2 or later
 
 Make modifications on your content based on time parameters. Show or hide part of a post at a given point in the future, calculate age and more.
@@ -73,6 +73,11 @@ On the other hand <code>[timelord mode="hide" from="2016-04" to="2017-04"]SOME C
 1. An example of how Time Lord is used.
 
 == Changelog ==
+
+= 1.2.1 =
+* FIX: Removed a PHP notice on sites that use a UTC offset instead of a city timezone.
+* FIX: Dates are now always read in the site's timezone, and the plugin no longer changes PHP's default timezone.
+* Requires WordPress 5.3 or newer.
 
 = 1.2 =
 * NEW FEATURE: Show content based on the day of the week.

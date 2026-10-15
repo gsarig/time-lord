@@ -3,7 +3,7 @@
 	Plugin Name: Time Lord
 	Plugin URI: http://wordpress.org/plugins/time-lord/
 	Description: Make modifications on your content based on time parameters. Show or hide part of a post at a given point in the future, calculate age and more. 
-	Version: 1.2
+	Version: 1.2.1
 	Author: Giorgos Sarigiannidis
 	Author URI: http://www.gsarigiannidis.gr
 */
