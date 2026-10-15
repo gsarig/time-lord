@@ -15,8 +15,6 @@
 	*/
 	function timelord_shortcode( $atts, $content = null ) {
 
-		date_default_timezone_set(get_option('timezone_string'));
-
 		$a = shortcode_atts( array(
 			'mode' 			=> 'show', 	// [timelord mode="hide"]
 			'from' 			=> false, 	// [timelord from="YYYY-MM-DD hh:mm:ss"]
@@ -35,7 +33,7 @@
 		if( !empty($a['year']) ) { // [timelord year="YEAR" ordinal="yes"]
 
 			$year_set 		= filter_var( $a['year'], FILTER_SANITIZE_NUMBER_INT );
-			$year_current 	= date('Y');
+			$year_current 	= wp_date('Y');
 			$set_age 		= abs( $year_current - $year_set );
 			$age 			= ( $a['ordinal'] === 'yes' ) ? ordinal($set_age) : $set_age;
 
@@ -51,21 +49,21 @@
 			$every 		= $a['every'];
 			$set_begin 	= !empty($a['from']) ? $a['from'] : get_the_modified_date('Y-m-d H:i'); // If "from" date is set, get it. Else, get the date for the post's last modification
 			$no_end 	= $now + (60*60*60);
-			$set_end 	= !empty($a['to']) ? $a['to'] : date('d M Y H:i:s', $no_end); // If "to" date is set, get it. Else, set it as a really distant date in the future
-			$begin 		= new DateTime( $set_begin );
-			$end 		= new DateTime( $set_end );
+			$set_end 	= !empty($a['to']) ? $a['to'] : wp_date('Y-m-d H:i:s', $no_end); // If "to" date is set, get it. Else, set it as a really distant date in the future. Numeric format, because wp_date() translates month names
+			$begin 		= new DateTime( $set_begin, wp_timezone() );
+			$end 		= new DateTime( $set_end, wp_timezone() );
 			$interval 	= !in_array( $every, $days ) ? DateInterval::createFromDateString($every) : new DateInterval('P1D');
 			$period 	= new DatePeriod($begin, $interval, $end, DatePeriod::EXCLUDE_START_DATE);
 			$i 			= 0;
 
 			foreach ( $period as $dt ) :
 				$count_interval 	= strtotime($every) - $now;
-				$count_iteration 	= strtotime($dt->format( "l Y-m-d H:i:s"));
+				$count_iteration 	= $dt->getTimestamp();
 				$count_difference 	= $count_iteration - $now;
 				
 				if( in_array( $every, $days ) ) { // If iteration every specific date is set (e.g. [timelord from="DATE" to="DATE" every="Monday"])
 
-					$get_content = ( date('l', $now) === $every ) ? $content : '';
+					$get_content = ( (int) wp_date('w', $now) === array_search( $every, $days ) ) ? $content : ''; // Compare the day's number, because wp_date() translates day names
 
 				} elseif( ($i++ % 2 == 0) && ($count_difference < $count_interval) && ($count_difference > 0)  ) { // If period is even (not odd), it has began but its not over yet
 
@@ -83,8 +81,10 @@
 
 		} else { // [timelord mode="hide" from="DATE" to="DATE" message="MESSAGE" from_msg="MESSAGE" to_msg="MESSAGE"]
 
-			$set_from 		= strtotime($a['from']);
-			$set_to 		= strtotime($a['to']);
+			$date_from 		= !empty($a['from']) ? date_create($a['from'], wp_timezone()) : false; // Parse as site-local time. date_create() returns false on an invalid date, keeping the fallback below
+			$date_to 		= !empty($a['to']) ? date_create($a['to'], wp_timezone()) : false;
+			$set_from 		= $date_from ? $date_from->getTimestamp() : false;
+			$set_to 		= $date_to ? $date_to->getTimestamp() : false;
 			$from 			= !empty($set_from) ? $set_from : ($now-1);
 			$to 			= !empty($set_to) ? $set_to : ($now+1);
 			$empty_msg	 	= $a['del'] === 'yes' ? '<del>' . do_shortcode($content) . '</del>' : '';
